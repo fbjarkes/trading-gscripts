@@ -86,9 +86,10 @@ function RSI_CALC(ticker, lookback) {
   entries = myGetHistoricalStockInfo(ticker,15); // 15 days should suffice
   var last = getLastPrice(ticker);
   if (last != "0" && entries[entries.length-1] != last) {
+    
     entries.push(last); 
   }
-  
+    
   return ""+rsiCalculation(ticker,entries,lookback);
 }
 
@@ -131,7 +132,7 @@ function rsiCalculation(ticker, entries, lookback)
     var change = entries[i] - entries[i-1];    
     upChanges = 0;
     downChanges = 0;
-    if (change >0) {
+    if (change > 0) {
       upChanges = change;
     } else {
       downChanges = Math.abs(change);
@@ -201,15 +202,18 @@ function getHistoricalPrices(ticker,days)
   var data = UrlFetchApp.fetch("http://www.google.com/finance/getprices?i=86400&p="+days+"d&f=c&q="+ticker);
   var entries = [];
   var contentLines = data.getContentText().split("\n");
-  
+
   if (contentLines) {
-    for (var i = 0; i < days-2; i++) {      
+    for (var i = 0; i < days-2; i++) {            
       var close = contentLines[contentLines.length-2-i];
-      entries.push(close);            
+      if (close > 0) {
+        entries.push(close);            
+      }
     }
   }
   entries = entries.reverse();
   
-  Logger.log("Fetched " + entries.length + " historical prices");
+  Logger.log("Fetched " + entries.length + " historical prices: "+entries.join(","));
   return entries;
 }
+
